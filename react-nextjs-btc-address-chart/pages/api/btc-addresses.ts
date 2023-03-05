@@ -10,11 +10,11 @@ interface SanitizeTSV {
   body: string[][];
 }
 
-// not really a CSV, more "tab separated values"
+// not really a CSV, more TSV "tab separated values"
 const sanitizeTSV = (csv: string): SanitizeTSV => {
   const allRows = csv
-    // BOM markers (start of file bytes)
-    // not stripped for some reason... may be a node version thing
+    // BOM markers (start of file bytes) not stripped for some reason...
+    // may be a node version thing
     .replace(/\�/g, "")
     // quotes (around date)
     .replace(/"/g, "")
