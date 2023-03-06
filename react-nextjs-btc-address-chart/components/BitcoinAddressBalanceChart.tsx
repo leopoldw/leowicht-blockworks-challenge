@@ -4,6 +4,7 @@ import { useState } from "react";
 import sub from "date-fns/sub";
 import isBefore from "date-fns/isBefore";
 import startOfYear from "date-fns/startOfYear";
+import parse from "date-fns/parse";
 import { BTCBalances } from "../pages/api/btc-addresses";
 
 const HEADER_LEGEND_MAP = {
@@ -24,20 +25,24 @@ type FILTER_VALUE_TYPE = typeof FILTER_VALUES[number];
 const formatBodyForChart = ({ header, body }: BTCBalances) => {
   const timeIndex = header.indexOf(HEADER_LEGEND_MAP["Time"]);
 
-  const labels = body.map((row) => row[timeIndex]);
+  // convert date to "seconds since epoch"
+  // to allow for downsampling / data decimation
+  const labels = body
+    .map((row) => row[timeIndex])
+    .map((dateString) => parse(dateString, "yyyy-MM-dd", new Date()).getTime());
 
   const datasets = FORMAT_ORDER.map((label: FORMAT_ORDER_TYPE) => {
     const columnIndex = header.indexOf(HEADER_LEGEND_MAP[label]);
     return {
       label,
-      data: body.map((row) => Number(row[columnIndex])),
+      data: body.map((row, index) => ({
+        x: labels[index],
+        y: Number(row[columnIndex]),
+      })),
     };
   });
 
-  return {
-    labels,
-    datasets,
-  };
+  return datasets;
 };
 
 interface FilterBody {
@@ -82,12 +87,14 @@ const BitcoinAddressBalanceChart = ({ header, body }: BTCBalances) => {
 
   const filteredBody = filterBody({ header, body, filter: selectedScale });
 
-  const result = formatBodyForChart({ header, body: filteredBody });
+  const datasets = formatBodyForChart({ header, body: filteredBody });
+
+  console.log(datasets);
 
   return (
     <div style={{ width: "1000px", height: "500px", margin: "0 auto" }}>
-      {result.labels.length ? (
-        <LineChart data={result} />
+      {datasets[0].data.length ? (
+        <LineChart datasets={datasets} />
       ) : (
         <div className="min-h-full bg-slate-100 flex items-center">
           <div className=" w-full text-center text-2xl">

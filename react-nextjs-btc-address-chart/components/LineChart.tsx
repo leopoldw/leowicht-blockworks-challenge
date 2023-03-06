@@ -26,35 +26,43 @@ Chart.register(
   Decimation
 );
 
+interface DataPoint {
+  x: number;
+  y: number;
+}
+
 interface DataSet {
   label: string;
-  data: number[]
+  data: DataPoint[];
 }
 
 interface LineChartType {
-  data: {
-    labels: string[],
-    datasets: DataSet[],
-  }
+  datasets: DataSet[];
 }
 
-const LineChart = ({ data }: LineChartType) => {
+const LineChart = ({ datasets }: LineChartType) => {
   return (
     <Line
-      data={data}
+      data={{ datasets }}
       options={{
+        parsing: false,
         animations: {
           tension: {
-            duration: 500,
-            easing: "linear",
-            from: 1,
-            to: 0,
+            duration: 250,
+            easing: "easeOutQuad",
           },
         },
         responsive: true,
         plugins: {
           autocolors: {
             enabled: true,
+          },
+          // intelligently reduce the number
+          // of points on screen for performance
+          decimation: {
+            enabled: true,
+            algorithm: "lttb",
+            samples: 250, // 1 point per 4 pixels (1000px / 4)
           },
           legend: {
             display: true,
@@ -65,11 +73,6 @@ const LineChart = ({ data }: LineChartType) => {
           },
           tooltip: {
             enabled: true,
-            callbacks: {
-              title: (context) => {
-                return context[0].label.replace(", 12:00:00 a.m.", "");
-              },
-            },
           },
         },
         scales: {
@@ -79,6 +82,7 @@ const LineChart = ({ data }: LineChartType) => {
               displayFormats: {
                 day: "d MMM yyyy",
               },
+              tooltipFormat: "d MMM yyyy",
             },
             ticks: {
               maxRotation: 0,

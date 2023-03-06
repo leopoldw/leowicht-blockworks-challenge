@@ -14,6 +14,7 @@ const RadioSelector = <Values extends string[]>({
       <div className="flex">
         {values.map((unitValue: string) => (
           <div
+            key={unitValue}
             onClick={() => onChange(unitValue)}
             className={`${
               value === unitValue
