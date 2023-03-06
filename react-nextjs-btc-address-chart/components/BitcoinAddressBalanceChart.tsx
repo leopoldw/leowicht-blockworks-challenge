@@ -4,7 +4,6 @@ import { useState } from "react";
 import sub from "date-fns/sub";
 import isBefore from "date-fns/isBefore";
 import startOfYear from "date-fns/startOfYear";
-import { LTTB } from "downsample";
 import { BTCBalances } from '../pages/api/btc-addresses'
 
 const HEADER_LEGEND_MAP = {
@@ -23,19 +22,15 @@ const FILTER_VALUES = ["All", "1M", "3M", "12M", "YTD"] as const;
 type FILTER_VALUE_TYPE = typeof FILTER_VALUES[number]
 
 const formatBodyForChart = ({ header, body }: BTCBalances) => {
-  // const data = LTTB(body, 800)
-  const data = body;
-  console.log("leo", body.length, data.length, body);
-
   const timeIndex = header.indexOf(HEADER_LEGEND_MAP["Time"]);
 
-  const labels = data.map((row) => row[timeIndex]);
+  const labels = body.map((row) => row[timeIndex]);
 
   const datasets = FORMAT_ORDER.map((label: FORMAT_ORDER_TYPE) => {
     const columnIndex = header.indexOf(HEADER_LEGEND_MAP[label]);
     return {
       label,
-      data: data.map((row) => Number(row[columnIndex])),
+      data: body.map((row) => Number(row[columnIndex]),
     };
   });
 
