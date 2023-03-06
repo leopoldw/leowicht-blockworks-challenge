@@ -6,6 +6,9 @@ import {
   PointElement,
   LineElement,
   TimeScale,
+  Tooltip,
+  Legend,
+  Decimation,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import { enUS } from "date-fns/locale";
@@ -17,10 +20,25 @@ Chart.register(
   PointElement,
   LineElement,
   TimeScale,
-  autocolors
+  autocolors,
+  Tooltip,
+  Legend,
+  Decimation
 );
 
-const LineChart = ({ data }) => {
+interface DataSet {
+  label: string;
+  data: number[]
+}
+
+interface LineChartType {
+  data: {
+    labels: string[],
+    datasets: DataSet[],
+  }
+}
+
+const LineChart = ({ data }: LineChartType) => {
   return (
     <Line
       data={data}
@@ -39,18 +57,32 @@ const LineChart = ({ data }) => {
             enabled: true,
           },
           legend: {
+            display: true,
             position: "top",
+            labels: {
+              padding: 40,
+            },
           },
-          decimation: {
+          tooltip: {
             enabled: true,
-            algorithm: 'lttb',
+            callbacks: {
+              title: (context) => {
+                return context[0].label.replace(", 12:00:00 a.m.", "");
+              },
+            },
           },
         },
         scales: {
           x: {
             type: "time",
             time: {
-              unit: "year",
+              displayFormats: {
+                day: "d MMM yyyy",
+              },
+            },
+            ticks: {
+              maxRotation: 0,
+              autoSkip: true,
             },
             adapters: {
               date: {
@@ -62,7 +94,6 @@ const LineChart = ({ data }) => {
             type: "linear",
             grace: "5%",
             beginAtZero: true,
-            suggestedMax: 10000000,
             ticks: {
               format: { notation: "compact" },
             },
