@@ -4,7 +4,7 @@ import { useState } from "react";
 import sub from "date-fns/sub";
 import isBefore from "date-fns/isBefore";
 import startOfYear from "date-fns/startOfYear";
-import { BTCBalances } from '../pages/api/btc-addresses'
+import { BTCBalances } from "../pages/api/btc-addresses";
 
 const HEADER_LEGEND_MAP = {
   Time: "Time",
@@ -16,10 +16,10 @@ const HEADER_LEGEND_MAP = {
 };
 
 const FORMAT_ORDER = [">1k", ">10k", ">100k", ">1m", ">10m"] as const;
-type FORMAT_ORDER_TYPE = typeof FORMAT_ORDER[number]
+type FORMAT_ORDER_TYPE = typeof FORMAT_ORDER[number];
 
 const FILTER_VALUES = ["All", "1M", "3M", "12M", "YTD"] as const;
-type FILTER_VALUE_TYPE = typeof FILTER_VALUES[number]
+type FILTER_VALUE_TYPE = typeof FILTER_VALUES[number];
 
 const formatBodyForChart = ({ header, body }: BTCBalances) => {
   const timeIndex = header.indexOf(HEADER_LEGEND_MAP["Time"]);
@@ -30,7 +30,7 @@ const formatBodyForChart = ({ header, body }: BTCBalances) => {
     const columnIndex = header.indexOf(HEADER_LEGEND_MAP[label]);
     return {
       label,
-      data: body.map((row) => Number(row[columnIndex]),
+      data: body.map((row) => Number(row[columnIndex])),
     };
   });
 
@@ -41,9 +41,9 @@ const formatBodyForChart = ({ header, body }: BTCBalances) => {
 };
 
 interface FilterBody {
-  header: BTCBalances['header'],
-  body: BTCBalances['body'],
-  filter: FILTER_VALUE_TYPE,
+  header: BTCBalances["header"];
+  body: BTCBalances["body"];
+  filter: FILTER_VALUE_TYPE;
 }
 
 const filterBody = ({ header, body, filter }: FilterBody) => {
@@ -76,7 +76,9 @@ const filterBody = ({ header, body, filter }: FilterBody) => {
 };
 
 const BitcoinAddressBalanceChart = ({ header, body }: BTCBalances) => {
-  const [selectedScale, setSelectedScale] = useState<FILTER_VALUE_TYPE>(FILTER_VALUES[0]);
+  const [selectedScale, setSelectedScale] = useState<FILTER_VALUE_TYPE>(
+    FILTER_VALUES[0]
+  );
 
   const filteredBody = filterBody({ header, body, filter: selectedScale });
 
